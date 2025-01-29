@@ -145,7 +145,7 @@ function serverUsageEmbed(serverData) {
                 inline: false,
             },
             {
-                name: `RAM - ${serverData.memory.used}/${serverData.memory.limit}MB`,
+                name: `RAM - ${serverData.memory.used}MB/${(serverData.memory.limit < 1 ? 'Unlimited' : `${serverData.memory.limit}MB`)}`,
                 value: `\`\`\`${hardwareUsageBar(serverData.memory.percent)}\`\`\``,
                 inline: false,
             }
@@ -156,7 +156,7 @@ function serverUsageEmbed(serverData) {
 }
 
 function hardwareUsageBar(percent) {
-    let fill = Math.round((percent / 100) * 22)
+    let fill = Math.round((percent / 100) * 22) > 22 ? 22 : Math.round((percent / 100) * 22)
     let bar = '['
     for (let i = 0; i < fill; i++) {
         bar += '■'

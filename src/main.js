@@ -3,6 +3,11 @@ import fs from 'fs';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { deployCommands } from "./discordComponents/deploy-commands.js";
 
+// Checks to make sure the .env file is completed
+if (!process.env.botToken || !process.env.botClientID || !process.env.botServerID || !process.env.pteroURL || !process.env.pteroAPI) {
+	console.log('Is looks like you are missing configuration variables! Restart when the .env variables are filled out.')
+} else {
+
 // Starts bot
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.once(Events.ClientReady, readyClient => {
@@ -47,3 +52,4 @@ client.on(Events.InteractionCreate, async interaction => {
 		};
 	};
 });
+}

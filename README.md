@@ -7,13 +7,13 @@ This *should* work with other hosts that use Pterodactyl as a base system.
 
 ### Running the bot
 
-#### Docker Compose (recommended)
-You can find an example compose file below.
+#### Docker Compose
+You can find an example compose file below. [docker-compose.yml](https://github.com/AdamFortney/pterodactyl-client-discord-bot/blob/main/github_content/docker-compose.yml).
 ```
 services:
   discord-bot:
     container_name: 'pterodactyl-bot'
-    image: adam80mb/pterodactyl-discord:latest
+    image: adam80mb/pterodactyl-client-discord-bot:latest
     restart: unless-stopped
     environment:
       botToken: ${botToken}
@@ -23,14 +23,18 @@ services:
       pteroURL: ${pteroURL}
 ```
 
-Then add the .env to fill out
+Then add the .env to fill out. [example.env](https://github.com/AdamFortney/pterodactyl-client-discord-bot/blob/main/github_content/example.env)
 ```
 botToken=
 botClientID=
-botGuildID=
+botServerID=
 pteroAPI=
 pteroURL=
 ```
+
+#### Pterodactyl Egg
+You can find the Egg import script [here](https://github.com/AdamFortney/pterodactyl-client-discord-bot/blob/main/github_content/egg-pterodactyl-client-discord-bot.json).
+After the instillation has finished, you can open the .env file to fill out as you follow the rest of the guide.
 
 ### Creating a Discord bot
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications/) and click "New Application"
