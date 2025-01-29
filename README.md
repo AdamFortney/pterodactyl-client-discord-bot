@@ -3,6 +3,33 @@ A Discord bot for managing your servers in Pterodactyl
 
 ## Setting up
 
+### Running the bot
+
+#### Docker Compose (recommended)
+You can find an example compose file below.
+```
+services:
+  discord-bot:
+    container_name: 'pterodactyl-bot'
+    image: adam80mb/pterodactyl-discord:latest
+    restart: unless-stopped
+    environment:
+      botToken: ${botToken}
+      botClientID: ${botClientID}
+      botServerID: ${botServerID}
+      pteroAPI: ${pteroAPI}
+      pteroURL: ${pteroURL}
+```
+
+Then add the .env to fill out
+```
+botToken=
+botClientID=
+botGuildID=
+pteroAPI=
+pteroURL=
+```
+
 ### Creating a Discord bot
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications/) and click "New Application"
 2. Navigate to the Installation page and set Install Link to "None"
@@ -29,13 +56,13 @@ A Discord bot for managing your servers in Pterodactyl
 > <br> Wrong: `https://panel.servers.com/servers`
 > <br> Wrong: `https://panel.servers.com/account/api`
 
-### Example of .env
+### Example of finished .env
 ```
-pteroAPI=ptlc_jhdsbvkjhbb87q3456dsfv
-pteroURL=https://panel.example.com
 botToken=MTMzMzi532oinb.23uy5g7ycvfi-nbyhbasdf-do
 botClientID=1323874650264512
 botServerID=1208976234509134
+pteroAPI=ptlc_jhdsbvkjhbb87q3456dsfv
+pteroURL=https://panel.example.com
 ```
 
 ### Inviting the bot

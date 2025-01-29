@@ -1,0 +1,11 @@
+services:
+  discord-bot:
+    container_name: 'pterodactyl-bot'
+    image: adam80mb/pterodactyl-discord:latest
+    restart: unless-stopped
+    environment:
+      botToken: ${botToken}
+      botClientID: ${botClientID}
+      botServerID: ${botServerID}
+      pteroAPI: ${pteroAPI}
+      pteroURL: ${pteroURL}
