@@ -1,7 +1,7 @@
 import "dotenv/config";
 import fs from 'fs';
-import { Client, Collection, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
-import { deployCommands } from "./deploy-commands.js";
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
+import { deployCommands } from "./discordComponents/deploy-commands.js";
 
 // Starts bot
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -19,7 +19,7 @@ deployCommands();
 client.commands = new Collection();
 const commandFiles = fs.readdirSync(`./src/discordComponents/commands/`).filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
-	const command = await import(`./commands/${file}`);
+	const command = await import(`./discordComponents/commands/${file}`);
 	const { data, execute } = command;
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
 	if (data && execute) {
