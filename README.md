@@ -1,5 +1,7 @@
-# Pterodactyl Discord
-A Discord bot for managing your servers in Pterodactyl
+# Discord bot for Pterodactyl Clients
+A Discord bot for managing your servers in Pterodactyl.
+This bot uses the ClientAPI, so it can be used reguardless if you host the panel or not.
+This *should* work with other hosts that use Pterodactyl as a base system.
 
 ## Setting up
 
@@ -82,8 +84,6 @@ At the top, you can set global permissions which effects all commands.
 To change permissions for each command, click on the command and set permissions there.
 
 ## Usage
-This bot uses the ClientAPI, so it can be used reguardless if you host the server or not.
-This *should* work with other hosts that use pterodactyl as a base system.
 
 ### Server Control
 `/control` will start the control menu.
