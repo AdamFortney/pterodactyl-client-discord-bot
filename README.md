@@ -3,6 +3,8 @@ A Discord bot for managing your servers in Pterodactyl.
 This bot uses the ClientAPI, so it can be used reguardless if you host the panel or not.
 This *should* work with other hosts that use Pterodactyl as a base system.
 
+<br>![Image of the Discord server control menu](https://i.imgur.com/ny8m1P6.png)
+
 ## Setting up
 
 ### Running the bot
@@ -98,12 +100,9 @@ After running the command, the server select dropdown will appear.
 After selecting a server, the control menu will appear with the server usage and action buttons.
 <br>![Image of the Discord server control menu](https://i.imgur.com/ny8m1P6.png)
 
-The *Start* button will be availble when the server is offline and sends the start command.
-The *Restart* button will be available when the server is running and sends the restart command.
-The *Stop* button will send the power down command to the server.
-A *Kill* button will become available after sending the shutdown command.
-The *Refresh* button will pull an updated status and hardware usage.
-The *Menu* button brings you back to the server select dropdown.
+Supported actions: start, stop, kill, & restart.
+<br>The *Refresh* button will pull an updated status and hardware usage.
+<br>The *Menu* button brings you back to the server select dropdown.
 
 > [!CAUTION]
 > Actions in the control menu can be used by anyone with access to the channel!!

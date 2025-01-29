@@ -20,7 +20,7 @@ export async function postEndpointData(endpoint, body) {
         };
     }
     catch (error) {
-        console.log('Failed fetching data from pterodactyl endpoint.');
+        console.log('Failed posting data from pterodactyl endpoint.');
         console.error(error.message);
     }
 }
@@ -43,7 +43,7 @@ export async function getEndpointData(endpoint) {
         return data;
     }
     catch (error) {
-        console.log('Failed posting data to pterodactyl endpoint');
+        console.log('Failed fetching data to pterodactyl endpoint');
         console.error(error.message);
     }
 }
