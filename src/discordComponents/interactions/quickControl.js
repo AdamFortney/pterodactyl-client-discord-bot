@@ -12,15 +12,21 @@ export async function serverActionMenu(interaction, selectedServer, manualState)
 
     // Server state overwrite to counter the slow response of the api
     let stateOverwrite = false
-    if (manualState == 'stop' && serverData.status != 'offline') {
+    if (!manualState) {}
+    else if (new Date().getTime() >= Number(manualState.time) + 25 * 1000) {}
+    else if (manualState.state == 'stop' && serverData.status != 'offline') {
         serverData.status = 'stopping'
         stateOverwrite = true
     } 
-    else if (manualState == 'kill' && serverData.status != 'offline') {
-        serverData.status = 'stopping'
+    else if (manualState.state == 'kill' && serverData.status != 'offline') {
+        serverData.status = 'offline'
+        serverData.uptime.days = 0
+        serverData.uptime.hours = 0
+        serverData.uptime.minutes = 0
+        serverData.uptime.seconds = 0
         stateOverwrite = true
     }
-    else if (manualState == 'start' && serverData.status == 'offline') {
+    else if (manualState.state == 'start' && serverData.status == 'offline') {
         serverData.status = 'starting'
         stateOverwrite = true
     };
@@ -46,7 +52,13 @@ export async function serverActionMenu(interaction, selectedServer, manualState)
     // If server action button, run server action and refresh the menu
     else if (actionResponse.customId != 'reload') {
         await sendPowerCommand(selectedServer, actionResponse.customId)
-        serverActionMenu(actionResponse, selectedServer, actionResponse.customId); 
+        
+        let commandState = {
+            state: `${actionResponse.customId}`,
+            time: `${new Date().getTime()}`
+        }
+        //commandState.time = new Date().toLocaleString();
+        serverActionMenu(actionResponse, selectedServer, commandState); 
     }
     
     // If other button (applies to 'reload' button) only refresh menu
@@ -105,7 +117,8 @@ function serverUsageEmbed(serverData) {
     let uptime = ''
     uptime += serverData.uptime.days > 0 ? `${serverData.uptime.days}d ` : ``
     uptime += serverData.uptime.hours > 0 ? `${serverData.uptime.hours}h ` : ``
-    uptime += serverData.uptime.minutes > 0 ? `${serverData.uptime.minutes}m` : ``
+    uptime += serverData.uptime.minutes > 0 ? `${serverData.uptime.minutes}m ` : ``
+    uptime += serverData.uptime.seconds > 0 ? `${serverData.uptime.seconds}s` : ``
     if (uptime.length == 0) {
         uptime = 'Offline'
     }
@@ -191,7 +204,7 @@ function powerActionRow(serverData) {
 
     // Creates action row
     const actionRow = new ActionRowBuilder()
-    .addComponents(start, stop, reload, menu)
+        .addComponents(start, stop, reload, menu)
 
     return actionRow
 }

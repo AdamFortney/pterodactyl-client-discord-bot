@@ -16,8 +16,8 @@ export async function serverSelectMenu() {
         let currentServer = serverList.data[item];
         select.addOptions(
             new StringSelectMenuOptionBuilder()
-                .setLabel(currentServer.attributes.name)
-                .setDescription(currentServer.attributes.description)
+                .setLabel(`${(currentServer.attributes.name).length < 1 ? 'Nameless Server' : `${currentServer.attributes.name}`}`)
+                .setDescription(`${(currentServer.attributes.description).length < 1 ? 'Server Missing Description' : `${currentServer.attributes.description}`}`)
                 .setValue(currentServer.attributes.identifier)
         )
     };
