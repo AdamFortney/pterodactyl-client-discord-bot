@@ -20,7 +20,7 @@ export async function execute(interaction) {
     });
 
     // Waits for response or timeout after 120s
-    try { const selectResponse = await serverSelect.resource.message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120_000 });
+    try { const selectResponse = await serverSelect.resource.message.awaitMessageComponent({ componentType: ComponentType.StringSelect, filter: (i => i.user.id === interaction.user.id), time: 120_000 });
     
     // After server select, replace dropdown
     interaction.editReply({
@@ -77,11 +77,11 @@ async function commandPopup(interaction) {
         const filter = i => i.customId === 'serverCommandMenu' && i.user.id === interaction.user.id;
 
         // Waits for event submission and return it through function
-        const modalSubmission = await interaction.awaitModalSubmit({ filter, time: 120000 });
+        const modalSubmission = await interaction.awaitModalSubmit({ filter, time: 180000 });
         return modalSubmission;
     } 
-    catch (error) {
-        console.error('Submission error:', error);
-        await interaction.followUp({ content: 'Submission timed out or failed.', ephemeral: true });
+    catch {
+        await interaction.editReply({ content: '', embeds: [{title: 'Submission timed out.'}] });
+        console.log('Server command aborted. Submission timed out or failed');
     }
 }

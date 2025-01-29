@@ -17,13 +17,11 @@ export async function postEndpointData(endpoint, body) {
 
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
-        }
-
-        //let data = await response.json();
-        //return data;
+        };
     }
     catch (error) {
-        console.error(error.message)
+        console.log('Failed fetching data from pterodactyl endpoint.');
+        console.error(error.message);
     }
 }
 
@@ -39,12 +37,13 @@ export async function getEndpointData(endpoint) {
 
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
-        }
+        };
 
         let data = await response.json();
         return data;
     }
     catch (error) {
-        console.error(error.message)
+        console.log('Failed posting data to pterodactyl endpoint');
+        console.error(error.message);
     }
 }

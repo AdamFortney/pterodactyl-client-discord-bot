@@ -6,6 +6,7 @@ export async function sendPowerCommand(serverID, state) {
     })
 
     postEndpointData(`/api/client/servers/${serverID}/power`, `${data}`)
+    console.log(`Sent power command ${state} to server with ID ${serverID}`)
 }
 
 export async function sendServerCommand(serverID, command) {
@@ -14,6 +15,7 @@ export async function sendServerCommand(serverID, command) {
     })
 
     postEndpointData(`/api/client/servers/${serverID}/command`, `${data}`)
+    console.log(`Sent console command "${command}" to server with ID ${serverID}`)
 }
 
 // Planned functions
