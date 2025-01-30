@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, ComponentType } from 'discord.js';
 import { serverSelectMenu } from '../interactions/serverSelect.js';
 import { sendServerCommand } from '../../pteroComponents/serverCommands.js';
+import { getEndpointData } from '../../pteroComponents/pteroManager.js';
 
 // Creates command in list
 export const data = new SlashCommandBuilder()
@@ -21,32 +22,65 @@ export async function execute(interaction) {
 
     // Waits for response or timeout after 120s
     try { const selectResponse = await serverSelect.resource.message.awaitMessageComponent({ componentType: ComponentType.StringSelect, filter: (i => i.user.id === interaction.user.id), time: 120_000 });
-    
-    // After server select, replace dropdown
-    interaction.editReply({
-        content: '',
-        components: [],
-        embeds: [{title: "Waiting for command..."}],
-        withResponse: true,
-    });
 
-    // Send popup for command input and wait for response
-    const modalResponse = await commandPopup(selectResponse);
-
-    // Get the input values from popup
+    // Gets the selected server
     let selectedServer = selectResponse.values[0];
-    let submittedCommand = modalResponse.fields.getTextInputValue('consoleCommand');
 
-    // Send command to server
-    sendServerCommand(selectedServer, submittedCommand)
+    // Checks if server is locked
+    let serverState = (await getEndpointData(`/api/client/servers/${selectedServer}`)).data.attributes.status
+    if (serverState != null) {
+        interaction.editReply({
+            content: '',
+            components: [],
+            embeds: [{title: `Server is ${serverState}.`}]
+        });
+    } 
 
-    // Respond to the user confirming action
-    await modalResponse.update({
-        content: ``,
-        embeds: [{title: `Ran command: ${submittedCommand}`}],
-        components: [],
-        ephemeral: true,
-    });
+    // Checks if the server is offline
+    else if ((await getEndpointData(`/api/client/servers/${selectedServer}/resources`)).data.attributes.current_state == 'offline') {
+        interaction.editReply({
+            content: '',
+            components: [],
+            embeds: [{title: "Server is offline."}]
+        });
+    } 
+    
+    // If the server is ready
+    else {
+        interaction.editReply({
+            content: '',
+            components: [],
+            embeds: [{title: "Waiting for command..."}],
+            withResponse: true,
+        });
+
+        // Send popup for command input and wait for response
+        const modalResponse = await commandPopup(selectResponse);
+
+        // Get the input values from popup
+        let submittedCommand = modalResponse.fields.getTextInputValue('consoleCommand');
+
+        // Send command to server
+        let requestStatus = await sendServerCommand(selectedServer, submittedCommand)
+
+        // Checks if post request errored out
+        if (!requestStatus.ok) {
+            // Respond to the user about action error
+            await modalResponse.update({
+                content: ``,
+                embeds: [{title: `Unable to send command. Status: ${requestStatus.status}`}],
+                components: [],
+                ephemeral: true,
+            });
+        } else {
+            // Respond to the user confirming action
+            await modalResponse.update({
+                content: ``,
+                embeds: [{title: `Ran command: ${submittedCommand}`}],
+                components: [],
+                ephemeral: true,
+            });}
+    };
 
     // Catch error or timeout
     } catch { await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}] })}
@@ -77,7 +111,7 @@ async function commandPopup(interaction) {
         const filter = i => i.customId === 'serverCommandMenu' && i.user.id === interaction.user.id;
 
         // Waits for event submission and return it through function
-        const modalSubmission = await interaction.awaitModalSubmit({ filter, time: 180000 });
+        const modalSubmission = await interaction.awaitModalSubmit({ filter, time: 220000 });
         return modalSubmission;
     } 
     catch {

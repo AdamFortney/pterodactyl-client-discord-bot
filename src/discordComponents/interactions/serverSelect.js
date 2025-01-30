@@ -4,7 +4,7 @@ import "dotenv/config";
 
 export async function serverSelectMenu() {
     // Gets a list of servers
-    let serverList = await getEndpointData('/api/client/')
+    let serverList = (await getEndpointData('/api/client/')).data
 
     // Start Menu builder
     const select = new StringSelectMenuBuilder()

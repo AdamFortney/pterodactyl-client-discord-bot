@@ -13,7 +13,7 @@ export async function serverActionMenu(interaction, selectedServer, manualState)
     // Server state overwrite to counter the slow response of the api
     let stateOverwrite = false
     if (!manualState) {}
-    else if (new Date().getTime() >= Number(manualState.time) + 25 * 1000) {}
+    else if (serverData.uptime.uptime != manualState.time) {}
     else if (manualState.state == 'stop' && serverData.status != 'offline') {
         serverData.status = 'stopping'
         stateOverwrite = true
@@ -29,7 +29,10 @@ export async function serverActionMenu(interaction, selectedServer, manualState)
     else if (manualState.state == 'start' && serverData.status == 'offline') {
         serverData.status = 'starting'
         stateOverwrite = true
-    };
+    } else if (manualState.state == 'restart') {
+        serverData.status = 'starting'
+        stateOverwrite = true
+    }
 
     // Gets interaction components
     const actionRow = powerActionRow(serverData)
@@ -55,7 +58,7 @@ export async function serverActionMenu(interaction, selectedServer, manualState)
         
         let commandState = {
             state: `${actionResponse.customId}`,
-            time: `${new Date().getTime()}`
+            time: serverData.uptime.uptime
         }
         //commandState.time = new Date().toLocaleString();
         serverActionMenu(actionResponse, selectedServer, commandState); 
@@ -171,10 +174,11 @@ function hardwareUsageBar(percent) {
 
 function powerActionRow(serverData) {
     const start = new ButtonBuilder()
-    if (serverData.status == 'offline') {
+    if (serverData.status == 'offline' || serverData.locked == true) {
         start.setCustomId('start')
         start.setLabel('Start')
         start.setStyle(ButtonStyle.Success)
+        start.setDisabled(serverData.locked)
     } else {
         start.setCustomId('restart')
         start.setLabel('Restart')
@@ -186,6 +190,7 @@ function powerActionRow(serverData) {
         stop.setCustomId('stop')
         stop.setLabel('Stop')
         stop.setStyle(ButtonStyle.Danger)
+        stop.setDisabled(serverData.locked)
     } else {
         stop.setCustomId('kill')
         stop.setLabel('Kill')
