@@ -1,0 +1,31 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2025-01-31T08:26:49-05:00",
+    "name": "Pterodactyl Control Discord Bot",
+    "author": "adamfortney0@gmail.com",
+    "description": "Discord bot for pterodactyl that allows clients to control their servers using the Client API (server API key not needed)\r\n\r\nGithub:\r\nhttps:\/\/github.com\/AdamFortney\/pterodactyl-control-discord-bot\/tree\/main",
+    "features": null,
+    "docker_images": {
+        "ghcr.io\/parkervcp\/yolks:nodejs_20": "ghcr.io\/parkervcp\/yolks:nodejs_20"
+    },
+    "file_denylist": [],
+    "startup": "node .\/src\/main.js",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Ready! Logged in as \"\r\n}",
+        "logs": "{}",
+        "stop": "^c"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# NodeJS App Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\napt update\r\napt install -y git\r\n\r\nmkdir -p \/mnt\/server\r\ncd \/mnt\/server\r\n\r\nif [ \"$(ls \/mnt\/server)\" ]; then\r\n    echo \"Existing app found, pulling updated version\"\r\n    git pull\r\nelse\r\n    echo -e \"Path empty, downloading bot\"\r\n        git clone https:\/\/github.com\/AdamFortney\/pterodactyl-control-discord-bot.git .\r\nfi\r\necho \"Installing nodejs packages\"\r\n\r\n\/usr\/local\/bin\/npm install\r\necho \"Node packages installed\"\r\n\r\necho \"Deleting extra files\"\r\nmv .\/github_content\/example.env .\/.env\r\nrm .dockerignore\r\nrm .gitignore\r\nrm dockerfile\r\nrm README.md\r\nrm LICENSE\r\nrm -r .\/github_content\r\n\r\necho -e \"install complete\"\r\nexit 0",
+            "container": "node:20-bookworm-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": []
+}
