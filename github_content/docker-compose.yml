@@ -1,7 +1,7 @@
 services:
   discord-bot:
     container_name: 'pterodactyl-bot'
-    image: adam80mb/pterodactyl-client-discord-bot:latest
+    image: adam80mb/pterodactyl-control-discord-bot:latest
     restart: unless-stopped
     environment:
       botToken: ${botToken}

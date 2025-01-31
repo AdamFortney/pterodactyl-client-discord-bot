@@ -3,19 +3,25 @@ A Discord bot for managing your servers in Pterodactyl.
 This bot uses the ClientAPI, so it can be used reguardless if you host the panel or not.
 This *should* work with other hosts that use Pterodactyl as a base system.
 
+## Features
+### `/control`
+Allows you to view and control the state of the server.
+
 <br>![Image of the Discord server control menu](https://i.imgur.com/ny8m1P6.png)
 
-## Setting up
+### `/command`
+Allows you to run a command on a selected server. 
+Example: `op MinecraftUser`
 
-### Running the bot
+## Running the bot
 
-#### Docker Compose
+### Docker Compose
 You can find an example compose file below. [docker-compose.yml](https://github.com/AdamFortney/pterodactyl-control-discord-bot/blob/main/github_content/docker-compose.yml).
 ```
 services:
   discord-bot:
     container_name: 'pterodactyl-bot'
-    image: adam80mb/pterodactyl-client-discord-bot:latest
+    image: adam80mb/pterodactyl-control-discord-bot:latest
     restart: unless-stopped
     environment:
       botToken: ${botToken}
@@ -34,9 +40,11 @@ pteroAPI=
 pteroURL=
 ```
 
-#### Pterodactyl Egg
+### Pterodactyl Egg
 You can find the Egg import script [here](https://github.com/AdamFortney/pterodactyl-control-discord-bot/blob/main/github_content/egg-pterodactyl-control-discord-bot.json).
 After the instillation has finished, you can open the .env file to fill out as you follow the rest of the guide.
+
+## Setting up
 
 ### Creating a Discord bot
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications/) and click "New Application"
