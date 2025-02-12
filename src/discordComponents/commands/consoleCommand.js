@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, ComponentType } from 'discord.js';
-import { serverSelectMenu } from '../interactions/serverSelect.js';
+import { serverSelectMenu } from '../components/serverSelect.js';
 import { sendServerCommand } from '../../pteroComponents/serverCommands.js';
 import { getEndpointData } from '../../pteroComponents/pteroManager.js';
 
@@ -83,8 +83,15 @@ export async function execute(interaction) {
     };
 
     // Catch error or timeout
-    } catch { await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}] })}
-    
+    } catch {
+    try { 
+        // Catch error or timeout
+        await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}]})
+    } catch(error) {
+        // Catch reply error and log
+        if(error.rawError.message == 'Unknown Message') {console.log('Unable to find message')}
+        else {console.log('An unknown error occured: ' + error)};
+    }}
 }
 
 async function commandPopup(interaction) {
@@ -113,9 +120,15 @@ async function commandPopup(interaction) {
         // Waits for event submission and return it through function
         const modalSubmission = await interaction.awaitModalSubmit({ filter, time: 220000 });
         return modalSubmission;
-    } 
-    catch {
-        await interaction.editReply({ content: '', embeds: [{title: 'Submission timed out.'}] });
-        console.log('Server command aborted. Submission timed out or failed');
     }
+    catch {
+        try { 
+            // Catch error or timeout
+            await interaction.editReply({ content: '', components: [], embeds: [{title: "Submission timed out."}]})
+            console.log('Server command aborted. Submission timed out or failed');
+        } catch(error) {
+            // Catch reply error and log
+            if(error.rawError.message == 'Unknown Message') {console.log('Unable to find message')}
+            else {console.log('An unknown error occured: ' + error)};
+        }}
 }

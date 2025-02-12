@@ -1,7 +1,9 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, ComponentType } from 'discord.js';
-import { serverSelectMenu } from '../interactions/serverSelect.js';
+import { serverSelectMenu } from '../components/serverSelect.js';
 import { getServerUsage } from '../../pteroComponents/serverUsage.js'
 import { sendPowerCommand } from '../../pteroComponents/serverCommands.js';
+import { powerActionRow } from '../components/serverPowerActions.js';
+import { serverUsageEmbed } from '../components/usageEmbed.js';
 import "dotenv/config";
 
 // Creates command in list
@@ -31,8 +33,17 @@ export async function execute(interaction) {
     let selectedServer = selectResponse.values[0];
     serverActionMenu(selectResponse, selectedServer);
 
-    // Catch error or timeout
-    } catch { await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}] })}
+    
+    } catch { 
+        try { 
+            // Catch error or timeout
+            await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}]})
+        } catch(error) {
+            // Catch reply error and log
+            if(error.rawError.message == 'Unknown Message') {console.log('Unable to find message')}
+            else {console.log('An unknown error occured: ' + error)};
+        }
+    }
     
 }
 
@@ -46,11 +57,11 @@ async function serverActionMenu(interaction, selectedServer, manualState){
     let stateOverwrite = false
     if (!manualState) {}
     else if (serverData.uptime.uptime != manualState.time) {}
-    else if (manualState.state == 'stop' && serverData.status != 'offline') {
+    else if (manualState.state == 'stop') {
         serverData.status = 'stopping'
         stateOverwrite = true
     } 
-    else if (manualState.state == 'kill' && serverData.status != 'offline') {
+    else if (manualState.state == 'kill') {
         serverData.status = 'offline'
         serverData.uptime.days = 0
         serverData.uptime.hours = 0
@@ -58,7 +69,7 @@ async function serverActionMenu(interaction, selectedServer, manualState){
         serverData.uptime.seconds = 0
         stateOverwrite = true
     }
-    else if (manualState.state == 'start' && serverData.status == 'offline') {
+    else if (manualState.state == 'start') {
         serverData.status = 'starting'
         stateOverwrite = true
     } else if (manualState.state == 'restart') {
@@ -79,7 +90,7 @@ async function serverActionMenu(interaction, selectedServer, manualState){
     })
 
     // Waits for action or timeout after 600s (10m)
-    try { const actionResponse = await serverAction.resource.message.awaitMessageComponent({ time: 600_000 });
+    try { const actionResponse = await serverAction.resource.message.awaitMessageComponent({ time: 120_000 });
     
     // If 'menu' button > change to select menu
     if (actionResponse.customId == 'menu') { controlSelectMenu(actionResponse) } 
@@ -105,14 +116,23 @@ async function serverActionMenu(interaction, selectedServer, manualState){
     };
 
     // Catch error or timeout
-    } catch { await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}] }); }
+    } catch {
+    try { 
+        // Catch error or timeout
+        await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}]})
+    } catch(error) {
+        // Catch reply error and log
+        if(error = 'Unknown Message') {console.log('Unable to find message')}
+        else {console.log('An unknown error occured: ' + error)};
+    }
+}
 
 }
 
 // Return to server select function
 async function controlSelectMenu(interaction) {
 
-    // Retrieves select menu item
+    // Retrieves select menu items
     const selectMenu = await serverSelectMenu(interaction)
 
     // Updates the interaction with the menu
@@ -131,124 +151,14 @@ async function controlSelectMenu(interaction) {
     serverActionMenu(selectResponse, selectedServer);
 
     // Catch error or timeout
-    } catch { await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}] }); }
+    } catch {
+    try { 
+        // Catch error or timeout
+        await interaction.editReply({ content: '', components: [], embeds: [{title: "Interaction timed out."}]})
+    } catch(error) {
+        // Catch reply error and log
+        if(error.rawError.message == 'Unknown Message') {console.log('Unable to find message')}
+        else {console.log('An unknown error occured: ' + error)};
+    }
 }
-
-// Generates the JSON for the server usage embed
-function serverUsageEmbed(serverData) {
-    let color = 0xB3B3B3;
-    switch(serverData.status) { 
-        case 'running': 
-            color = 0x1DB522; 
-            break; 
-        case 'offline': 
-            color = 0xB3B3B3; 
-            break;
-        case 'stopping':
-            color = 0xE03A3A; 
-            break;
-        case 'starting':
-            color = 0x3A45E0; 
-            break;
-        default:
-            break;
-    }
-
-    let uptime = ''
-    uptime += serverData.uptime.days > 0 ? `${serverData.uptime.days}d ` : ``
-    uptime += serverData.uptime.hours > 0 ? `${serverData.uptime.hours}h ` : ``
-    uptime += serverData.uptime.minutes > 0 ? `${serverData.uptime.minutes}m ` : ``
-    uptime += serverData.uptime.seconds > 0 ? `${serverData.uptime.seconds}s` : ``
-    if (uptime.length == 0) {
-        uptime = 'Offline'
-    }
-
-    const usageEmbed = {
-        color: color,
-        title: `${((serverData.name).length > 27) ? `${(serverData.name).slice(0,26)}...` : `${serverData.name}`}`,
-        description: `--------------------------------------`,
-        url: `${process.env.pteroURL}/server/${serverData.serverID}`,
-        fields: [
-            {
-                name: `State`,
-                value: `${serverData.status.replace(/^./, char => char.toUpperCase())}`,
-                inline: true,
-            },
-            {
-                name: `Uptime`,
-                value: `${uptime}`,
-                inline: true,
-            },
-            {
-                name: `CPU - ${serverData.cpu.percent}%`,
-                value: `\`\`\`${hardwareUsageBar((serverData.cpu.percent + 2))}\`\`\``,
-                inline: false,
-            },
-            {
-                name: `RAM - ${serverData.memory.used}MB/${(serverData.memory.limit < 1 ? 'Unlimited' : `${serverData.memory.limit}MB`)}`,
-                value: `\`\`\`${hardwareUsageBar(serverData.memory.percent)}\`\`\``,
-                inline: false,
-            }
-        ],
-    }
-
-    return usageEmbed
-}
-
-// Makes the hardware usage bar for use in the embed
-function hardwareUsageBar(percent) {
-    let fill = Math.round((percent / 100) * 22) > 22 ? 22 : Math.round((percent / 100) * 22)
-    let bar = '['
-    for (let i = 0; i < fill; i++) {
-        bar += '■'
-    }
-    for (let i = 22; i > fill; i--) {
-        bar +=' '
-    }
-    bar += ']'
-
-    return bar
-}
-
-// Constructs the power button row depeding on server state
-function powerActionRow(serverData) {
-    const start = new ButtonBuilder()
-    if (serverData.status == 'offline' || serverData.locked == true) {
-        start.setCustomId('start')
-        start.setLabel('Start')
-        start.setStyle(ButtonStyle.Success)
-        start.setDisabled(serverData.locked)
-    } else {
-        start.setCustomId('restart')
-        start.setLabel('Restart')
-        start.setStyle(ButtonStyle.Success)
-    }
-
-    const stop = new ButtonBuilder()
-    if (serverData.status != 'stopping') {
-        stop.setCustomId('stop')
-        stop.setLabel('Stop')
-        stop.setStyle(ButtonStyle.Danger)
-        stop.setDisabled(serverData.locked)
-    } else {
-        stop.setCustomId('kill')
-        stop.setLabel('Kill')
-        stop.setStyle(ButtonStyle.Danger)
-    }
-
-    const reload = new ButtonBuilder()
-        .setCustomId('reload')
-        .setLabel('Reload')
-        .setStyle(ButtonStyle.Primary)
-
-    const menu = new ButtonBuilder()
-        .setCustomId('menu')
-        .setLabel('Menu')
-        .setStyle(ButtonStyle.Secondary)
-
-    // Creates action row
-    const actionRow = new ActionRowBuilder()
-        .addComponents(start, stop, reload, menu)
-
-    return actionRow
 }
